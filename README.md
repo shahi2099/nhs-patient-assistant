@@ -1,6 +1,8 @@
 
 # NHS Patient Assistant
 
+An end-to-end Retrieval-Augmented Generation (RAG) application that provides grounded answers using NHS Inform Scotland content.
+
 ## Table of Contents 
 
 - Problem Description
