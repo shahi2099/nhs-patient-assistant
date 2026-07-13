@@ -15,7 +15,8 @@
 - Project Structure
 - Installation
 - Running the Project
-- API Examples
+- Test the API Locally (Optional)
+- Evaluation Mapping
 - Technologies
 - Future Improvements
 
@@ -79,6 +80,7 @@ https://www.nhsinform.scot/illnesses-and-conditions/a-to-z/
 
 - 425 NHS illness and condition pages
 - Stored as [`data/nhs-symptom.json`](data/nhs-symptom.json)
+- Data is downloaded as part of Automated Ingestion Pipeline. The code is [`src/nhs_download.py`](src/nhs_download.py)
 
 Each record contains:
 
@@ -92,6 +94,7 @@ Each record contains:
 
 - 6,855 chunks
 - Stored as [`data/nhs-symptom-chunks.json`](data/nhs-symptom-chunks.json)
+- Data is generated as part of Automated Ingestion Pipeline. The code is [`src/nhs_chunking_data.py`](src/nhs_chunking_data.py) 
 
 Each chunk contains:
 
@@ -164,11 +167,13 @@ The application combines:
 - Reciprocal Rank Fusion (RRF)
 - Query rewriting
 
+Both a knowledge base and an LLM are used in the flow.
+
 ---
 
 # Retrieval Evaluation
 
-Ground truth generated from 100 NHS documents (2 questions per document).
+To identify the most effective retrieval strategy, multiple retrieval approaches were evaluated using a ground truth dataset generated from 100 NHS documents (2 questions per document). The dataset is in [`data/ground-truth-retrieval.csv`](data/ground-truth-retrieval.csv)
 
 | Method | Hit Rate | MRR |
 |---------|---------:|----:|
@@ -177,20 +182,35 @@ Ground truth generated from 100 NHS documents (2 questions per document).
 | Vector|0.850|0.640|
 | **Hybrid (Selected)**|**0.950**|**0.690**|
 
-Hybrid retrieval produced the best overall performance and is used by the application.
+The hybrid retrieval approach achieved the highest Hit Rate and MRR and was therefore selected as the retrieval method used by the application.
+
+Retrieval evaluation notebook:
+
+- [`notebooks/nhs_search_pgdb.ipynb`](notebooks/nhs_search_pgdb.ipynb): Retrieval evaluation.
+- [`evaluation-data-generation.ipynb`](notebooks/evaluation-data-generation.ipynb): Ground truth dataset generation.
 
 ---
 
 # LLM Evaluation
 
-LLM-as-a-Judge was used to compare multiple models.
+To identify the best LLM for answer generation, multiple models were evaluated using an LLM-as-a-Judge approach.
 
 | Model | Relevant | Partly Relevant |
 |-------|----------:|----------------:|
 | GPT-5.4-mini |98.0%|2.0%|
 | GPT-4o|91.5%|8.5%|
 
-GPT-5.4-mini was selected because it produced the highest relevance score.
+GPT-5.4-mini achieved the highest relevance score and was therefore selected as the model used by the application.
+
+LLM evaluation notebook:
+
+- [`notebooks/nhs_llm_eval.ipynb`](notebooks/nhs_llm_eval.ipynb): evaluation models
+
+
+Evaluation data:
+
+- [`data/rag-eval-gpt-4o.csv`](data/rag-eval-gpt-4o.csv)
+- [`data/rag-eval-gpt-5.4-mini.csv`](data/rag-eval-gpt-5.4-mini.csv)
 
 ---
 
@@ -234,6 +254,12 @@ Features include:
 - Conversation
 - Model usage
 - Cost
+
+Open:
+
+```
+http://localhost:3000
+```
 
 Dashboard configuration:
 
@@ -302,12 +328,14 @@ OPENAI_API_KEY='YOUR_KEY'
 ## 4. Start containers
 
 ```bash
+# Start all services (Postgres, app, and Grafana) - everything is in docker-compose.
 docker compose up -d
 ```
 
-## 5. Prepare database
+## 5. Prepare database schema
 
 ```bash
+# Create the PostgreSQL schema, tables, and indexes.
 export POSTGRES_HOST=localhost
 uv run python src/db_prep.py
 ```
@@ -315,6 +343,7 @@ uv run python src/db_prep.py
 ## 6. Download and ingest data
 
 ```bash
+# Download the latest NHS Inform Scotland data and ingest it into PostgreSQL.
 export POSTGRES_HOST=localhost
 make update-data
 ```
@@ -327,7 +356,7 @@ uv run streamlit run src/streamlit_app.py
 
 ---
 
-# API Example via CLI locally (optional)
+# Test the API Locally (Optional)
 
 ```bash
 curl -X POST http://localhost:5000/question \
@@ -355,14 +384,14 @@ curl -X POST http://localhost:5000/feedback \
 | LLM Evaluation | ✅ |
 | Streamlit UI | ✅ |
 | Flask API | ✅ |
-| Automated Ingestion | ✅ |
+| Automated Ingestion Pipeline | ✅ |
 | Monitoring Dashboard | ✅ |
 | User Feedback | ✅ |
 | Docker Compose | ✅ |
 | Reproducibility | ✅ |
 | Hybrid Search | ✅ |
 | Document re-ranking | ✅ |
-| Query Rewriting | ✅ |
+| User query rewriting | ✅ |
 
 ---
 
