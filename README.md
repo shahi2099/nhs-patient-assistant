@@ -1,7 +1,18 @@
 
 # NHS Patient Assistant
 
-An end-to-end Retrieval-Augmented Generation (RAG) application that provides grounded answers using NHS Inform Scotland content.
+An end-to-end Retrieval-Augmented Generation (RAG) application that provides grounded answers using NHS Inform Scotland content, the official public health information service for Scotland.
+
+The application combines hybrid retrieval (keyword + vector search), query rewriting, Reciprocal Rank Fusion (RRF), and GPT-5.4-mini to generate grounded responses.
+
+---
+
+## Demo
+Watch the demo interface in action:
+
+![Dashboard](images/demo.gif)
+
+---
 
 ## Table of Contents 
 
@@ -16,7 +27,6 @@ An end-to-end Retrieval-Augmented Generation (RAG) application that provides gro
 - Monitoring
 - Project Structure
 - Installation
-- Running the Project
 - Test the API Locally (Optional)
 - Evaluation Mapping
 - Technologies
@@ -46,11 +56,11 @@ The application allows users to:
                         │
                  nhs_download.py
                         │
-              nhs-symptom.json (425)
+              nhs-symptom.json (~425)
                         │
              nhs_chunking_data.py
                         │
-         nhs-symptom-chunks.json (6855)
+         nhs-symptom-chunks.json (~6855)
                         │
                   ingest.py
                         │
@@ -75,6 +85,8 @@ The application allows users to:
 # Dataset
 
 Source:
+
+NHS Inform Scotland A–Z of Illnesses and Conditions, the official public health information website for Scotland.
 
 https://www.nhsinform.scot/illnesses-and-conditions/a-to-z/
 
@@ -189,7 +201,7 @@ The hybrid retrieval approach achieved the highest Hit Rate and MRR and was ther
 Retrieval evaluation notebook:
 
 - [`notebooks/nhs_search_pgdb.ipynb`](notebooks/nhs_search_pgdb.ipynb): Retrieval evaluation.
-- [`evaluation-data-generation.ipynb`](notebooks/evaluation-data-generation.ipynb): Ground truth dataset generation.
+- [`notebooks/nhs_ground_truth_generation.ipynb`](notebooks/nhs_ground_truth_generation.ipynb): Ground truth dataset generation.
 
 ---
 
